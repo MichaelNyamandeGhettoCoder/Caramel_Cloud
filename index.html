@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Caramel Cloud Kitchen & Cosmetics</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css" />
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f5f5f5;
+            transition: padding-bottom 0.3s;
+        }
+        body.cart-open { padding-bottom: 240px; }
+
+.navbar { background: #d63384; color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
+.hamburger { font-size: 24px; cursor: pointer; padding: 4px; }
+.nav-title { font-size: 18px; font-weight: 700; letter-spacing: 0.3px; }
+.cart-icon { font-size: 24px; cursor: pointer; position: relative; }
+.cart-count { position: absolute; top: -8px; right: -8px; background: #ffc107; color: #000; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; display: flex; align-items: center; justify-content: center; font-weight: 700; }
+
+.category-bar {
+        background: white;
+        padding: 12px 0;
+        overflow-x: auto;
+        white-space: nowrap;
+        border-bottom: 1px solid #eee;
+        position: sticky;
+        top: 58px;
+        z-index: 99;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      }
+.category-bar::-webkit-scrollbar { display: none; }
+.category-pills { padding: 0 15px; display: inline-flex; gap: 8px; }
+.cat-pill {
+        display: inline-block;
+        padding: 8px 16px;
+        background: #fdf2f8;
+        color: #d63384;
+        border: 2px solid #f9a8d4;
+        border-radius: 20px;
+        font-size: 14px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.2s;
+        cursor: pointer;
+      }
+.cat-pill:hover,.cat-pill.active {
+        background: #d63384;
+        color: white;
+        border-color: #d63384;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(214, 51, 132, 0.25);
+      }
+
+.side-nav {
+        height: 100%; width: 0; position: fixed; z-index: 200; top: 0; left: 0;
+        background: linear-gradient(180deg, #fff 0%, #fdf2f8 100%);
+        overflow-x: hidden; transition: 0.3s;
+        box-shadow: 4px 0 20px rgba(0,0,0,0.15);
+        display: flex; flex-direction: column;
+        font-family: 'Poppins', sans-serif;
+      }
+.side-nav-header {
+        padding: 30px 20px 25px;
+        text-align: center;
+        background: linear-gradient(135deg, #d63384 0%, #b02a5b 100%);
+        margin-bottom: 10px;
+        position: relative;
+        overflow: hidden;
+}
+.side-nav-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+        animation: shimmer 3s infinite;
+}
+@keyframes shimmer {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+}
+.side-nav-logo {
+        width: 160px;
+        height: auto;
+        filter: drop-shadow(0 4px 12px rgba(0,0,0,0.3));
+        transition: transform 0.3s;
+        position: relative;
+        z-index: 1;
+}
+.side-nav-logo:hover {
+        transform: scale(1.08);
+}
+.side-nav-content {
+        padding-top: 8px;
+        padding-bottom: 0;
+        flex: 1;
+    }
+.side-nav a {
+        padding: 14px 24px;
+        text-decoration: none;
+        font-size: 15px;
+        font-weight: 500;
+        color: #2d2d2d;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        transition: all 0.25s;
+        border-left: 4px solid transparent;
+        letter-spacing: 0.2px;
+      }
+.side-nav a:hover {
+        background: linear-gradient(90deg, #fdf2f8 0%, rgba(253,242,248,0.3) 100%);
+        border-left-color: #d63384;
+        color: #d63384;
+        padding-left: 28px;
+      }
+.side-nav a:active {
+        transform: scale(0.98);
+}
+.side-nav a:last-of-type { margin-bottom: 8px; }
+.close-btn {
+        position: absolute; top: 15px; right: 15px;
+        width: 36px; height: 36px;
+        background: rgba(255,255,255,0.2); color: white;
+        border-radius: 50%; font-size: 22px;
+        display: flex; align-items: center; justify-content: center;
+        cursor: pointer; transition: 0.2s;
+        backdrop-filter: blur(4px);
+        z-index: 2;
+      }
+.close-btn:hover { background: rgba(255,255,255,0.3); transform: rotate(90deg); }
+
+/* Dev signature - visible for marketing */
+.dev-signature {
+        padding: 12px 20px 18px;
+        border-top: 1px solid #f0e6eb;
+        text-align: center;
+        opacity: 1;
+        transition: 0.2s;
+    }
+.dev-signature:hover { opacity: 0.9; }
+.dev-signature.made-by {
+        font-size: 11px;
+        color: #d63384;
+        font-weight: 600;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        margin-bottom: 8px;
+    }
+.dev-signature img {
+        width: 90px;
+        height: auto;
+        filter: drop-shadow(0 1px 3px rgba(0,0,0,0.1));
+    }
+
+.container { padding: 15px; }
+.category-title { font-size: 18px; margin: 20px 0 12px 5px; color: #333; font-weight: 700; }
+.product-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.product-grid.single { grid-template-columns: 1fr; }
+.product-card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.08); position: relative; }
+.product-card img { width: 100%; height: 160px; object-fit: cover; cursor: zoom-in; }
+.product-grid.single.product-card img { height: 220px; }
+.photo-count { position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,0.6); color: white; padding: 2px 8px; border-radius: 12px; font-size: 12px; font-weight: 600; }
+.product-info { padding: 12px; text-align: center; }
+.product-name { font-weight: 600; margin-bottom: 4px; font-size: 15px; }
+.product-price { color: #d63384; font-weight: 700; font-size: 16px; margin-bottom: 10px; }
+.add-btn { width: 100%; background: #d63384; color: white; border: none; padding: 10px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: 'Poppins', sans-serif; }
+.add-btn:active { transform: scale(0.98); }
+.sticky-cart { position: fixed; bottom: 0; left: 0; right: 0; background: white; box-shadow: 0 -2px 10px rgba(0,0,0,0.15); z-index: 150; display: none; max-height: 240px; }
+.sticky-cart.show { display: flex; flex-direction: column; }
+.cart-header { display: flex; justify-content: space-between; padding: 12px 15px 8px; font-weight: 700; font-size: 15px; border-bottom: 1px solid #f0f0f0; }
+.cart-items-list { max-height: 60px; overflow-y: auto; padding: 6px 15px; font-size: 13px; color: #555; line-height: 1.4; }
+.cart-item-line { margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cart-inputs { padding: 8px 15px 0; }
+.cart-inputs input { width: 100%; padding: 5px; margin: 4px 0; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; font-family: 'Poppins', sans-serif; }
+.whatsapp-btn { width: calc(100% - 30px); margin: 8px 15px 12px; background: #25D366; color: white; border: none; padding: 14px; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; font-family: 'Poppins', sans-serif; }
+.modal { display: none; position: fixed; z-index: 300; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
+.modal-content { background: white; margin: 10% auto; width: 90%; max-width: 500px; border-radius: 12px; max-height: 80vh; display: flex; flex-direction: column; }
+.modal-header { padding: 20px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+.modal-header h2 { font-weight: 700; }
+.modal-close { font-size: 28px; cursor: pointer; }
+.modal-body { padding: 20px; overflow-y: auto; flex: 1; }
+.cart-item { display: flex; gap: 15px; margin-bottom: 20px; align-items: center; }
+.cart-item img { width: 60px; height: 60px; object-fit: cover; border-radius: 8px; }
+.cart-item-info { flex: 1; }
+.cart-item-info strong { font-weight: 600; }
+.qty-controls { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
+.qty-btn { width: 28px; height: 28px; border: 1px solid #ccc; background: white; border-radius: 6px; font-size: 18px; cursor: pointer; font-family: 'Poppins', sans-serif; }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <span class="hamburger" onclick="openNav()">&#9776;</span>
+        <span class="nav-title">Caramel Cloud</span>
+        <div class="cart-icon" onclick="openCart()">
+            🛒
+            <span id="cart-count" class="cart-count" style="display:none;">0</span>
+        </div>
+    </div>
+
+    <div class="category-bar" id="categoryBar">
+        <div class="category-pills" id="categoryPills"></div>
+    </div>
+
+    <div id="sideNav" class="side-nav">
+        <div class="side-nav-header">
+            <span class="close-btn" onclick="closeNav()">×</span>
+            <img src="Caramel Cloud logo.png" alt="Caramel Cloud" class="side-nav-logo">
+        </div>
+        <div class="side-nav-content">
+            <div id="sideNavLinks"></div>
+            <a href="https://wa.me/263717236434" target="_blank">📱 Contact Us</a>
+            <a href="admin.html" style="display:hidden">⚙️ Admin</a>
+        </div>
+        <div class="dev-signature">
+            <div class="made-by">Made By</div>
+            <img src="developer logo.png" alt="Ghetto Coder">
+        </div>
+    </div>
+
+    <div class="container" id="product-container"></div>
+
+    <div id="stickyCart" class="sticky-cart">
+        <div class="cart-header">
+            <span>Your Order:</span>
+            <span id="sticky-total">Total: $0.00</span>
+        </div>
+        <div class="cart-items-list" id="sticky-items"></div>
+        <div class="cart-inputs">
+            <input type="text" id="customer-name" placeholder="Your Name">
+            <input type="text" id="customer-address" placeholder="Delivery Address">
+        </div>
+        <button class="whatsapp-btn" onclick="checkoutWhatsApp()">Send Order to WhatsApp</button>
+    </div>
+
+    <div id="cartModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Edit Order</h2>
+                <span class="modal-close" onclick="closeCart()">&times;</span>
+            </div>
+            <div class="modal-body" id="cart-items"></div>
+        </div>
+    </div>
+
+<script src="https://cdn.jsdelivr.net/npm/glightbox/dist/js/glightbox.min.js"></script>
+<script>
+    const WHATSAPP_NUMBER = "263717236434";
+    let cart = JSON.parse(localStorage.getItem('caramel_cart') || '[]');
+    let lightbox;
+
+    function openNav() {
+        document.getElementById("sideNav").style.width = "260px";
+        document.body.style.overflow = 'hidden';
+    }
+    function closeNav() {
+        document.getElementById("sideNav").style.width = "0";
+        document.body.style.overflow = '';
+    }
+    function openCart() { renderCartModal(); document.getElementById("cartModal").style.display = "block"; }
+    function closeCart() { document.getElementById("cartModal").style.display = "none"; }
+
+    function updateCartUI() {
+        let count = cart.reduce((sum, item) => sum + item.qty, 0);
+        let total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+        let countEl = document.getElementById('cart-count');
+
+        if (count > 0) {
+            countEl.style.display = 'flex';
+            countEl.innerText = count;
+            document.getElementById('stickyCart').classList.add('show');
+            document.body.classList.add('cart-open');
+        } else {
+            countEl.style.display = 'none';
+            document.getElementById('stickyCart').classList.remove('show');
+            document.body.classList.remove('cart-open');
+        }
+
+        document.getElementById('sticky-total').innerText = `Total: $${total.toFixed(2)}`;
+        document.getElementById('sticky-items').innerHTML = cart.map(item =>
+            `<div class="cart-item-line">${item.qty}x ${item.name} - $${(item.price * item.qty).toFixed(2)}</div>`
+        ).join('');
+    }
+
+    function addToCart(name, price, image) {
+        let existing = cart.find(item => item.name === name);
+        if (existing) {
+            existing.qty += 1;
+        } else {
+            cart.push({name, price, image, qty: 1});
+        }
+        localStorage.setItem('caramel_cart', JSON.stringify(cart));
+        updateCartUI();
+        let btn = event.target;
+        btn.innerText = 'Added ✓';
+        setTimeout(() => {btn.innerText = 'Add';}, 1000);
+    }
+
+    function changeQty(index, delta) {
+        cart[index].qty += delta;
+        if (cart[index].qty <= 0) cart.splice(index, 1);
+        localStorage.setItem('caramel_cart', JSON.stringify(cart));
+        renderCartModal();
+        updateCartUI();
+    }
+
+    function renderCartModal() {
+        let cartDiv = document.getElementById('cart-items');
+        if (cart.length === 0) {
+            cartDiv.innerHTML = '<div style="text-align:center;padding:40px;color:#888;">Your cart is empty</div>';
+            return;
+        }
+        cartDiv.innerHTML = cart.map((item, index) => `
+            <div class="cart-item">
+                <img src="${item.image}" alt="${item.name}">
+                <div class="cart-item-info">
+                    <div><strong>${item.name}</strong></div>
+                    <div>$${item.price} each</div>
+                    <div class="qty-controls">
+                        <button class="qty-btn" onclick="changeQty(${index}, -1)">-</button>
+                        <span>${item.qty}</span>
+                        <button class="qty-btn" onclick="changeQty(${index}, 1)">+</button>
+                    </div>
+                <div><strong>$${(item.price * item.qty).toFixed(2)}</strong></div>
+            </div>
+        `).join('');
+    }
+
+    function checkoutWhatsApp() {
+        if (cart.length === 0) return alert('Cart is empty');
+        let name = document.getElementById('customer-name').value.trim();
+        let address = document.getElementById('customer-address').value.trim();
+        if (!name ||!address) return alert('Please enter your name and address');
+
+        let message = `Hi Caramel Cloud! New Order:\n\n`;
+        let total = 0;
+        cart.forEach(item => {
+            message += `• ${item.qty}x ${item.name} - $${(item.price * item.qty).toFixed(2)}\n`;
+            total += item.price * item.qty;
+        });
+        message += `\n*Total: $${total.toFixed(2)}*\n\n`;
+        message += `Name: ${name}\nAddress: ${address}\n\nPlease confirm availability.`;
+
+        window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`, '_blank');
+
+        cart = [];
+        localStorage.setItem('caramel_cart', JSON.stringify(cart));
+        document.getElementById('customer-name').value = '';
+        document.getElementById('customer-address').value = '';
+        updateCartUI();
+    }
+
+    function loadProducts() {
+        let products = JSON.parse(localStorage.getItem('caramel_products') || '[]');
+        let container = document.getElementById('product-container');
+        let categories = [...new Set(products.map(p => p.category))];
+
+        renderCategoryBar(categories);
+        renderSideNavLinks(categories);
+
+        if (products.length === 0) {
+            container.innerHTML = '<p style="text-align:center; padding:40px; color:#888;">No products yet. Add some in Admin.</p>';
+            return;
+        }
+        container.innerHTML = categories.map(cat => {
+            let catProducts = products.filter(p => p.category === cat);
+            let gridClass = catProducts.length === 1? 'product-grid single' : 'product-grid';
+            return `
+                <h2 class="category-title" id="${cat}">${cat}</h2>
+                <div class="${gridClass}">
+                    ${catProducts.map((p, productIndex) => {
+                        const images = p.images || [p.image];
+                        const galleryId = `product-${cat}-${productIndex}`;
+                        return `
+                        <div class="product-card">
+                            ${images.length > 1? `<div class="photo-count">1/${images.length}</div>` : ''}
+                            <a href="${images[0]}" class="glightbox" data-gallery="${galleryId}" data-title="${p.name}">
+                                <img src="${images[0]}" alt="${p.name}">
+                            </a>
+                            ${images.slice(1).map(img => `
+                                <a href="${img}" class="glightbox" data-gallery="${galleryId}" data-title="${p.name}" style="display:none;"></a>
+                            `).join('')}
+                            <div class="product-info">
+                                <div class="product-name">${p.name}</div>
+                                <div class="product-price">$${p.price}</div>
+                                <button class="add-btn" onclick="addToCart('${p.name.replace(/'/g, "\\'")}', ${p.price}, '${images[0]}')">Add</button>
+                            </div>
+                        </div>
+                    `}).join('')}
+                </div>
+            `;
+        }).join('');
+
+        initLightbox();
+    }
+
+    function renderCategoryBar(categories) {
+        const emoji = { 'Cakes': '🎂', 'Cosmetics': '💄' };
+        const pills = categories.map(cat =>
+            `<a href="#${cat}" class="cat-pill" onclick="closeNav()">${emoji[cat] || '✨'} ${cat}</a>`
+        ).join('');
+        document.getElementById('categoryPills').innerHTML = pills || '<span style="color:#999; padding:8px;">No categories yet</span>';
+    }
+
+    function renderSideNavLinks(categories) {
+        const emoji = { 'Cakes': '🎂', 'Cosmetics': '💄' };
+        const links = categories.map(cat =>
+            `<a href="#${cat}" onclick="closeNav()">${emoji[cat] || '✨'} ${cat}</a>`
+        ).join('');
+        document.getElementById('sideNavLinks').innerHTML = links;
+    }
+
+    function initLightbox() {
+        if (lightbox) lightbox.destroy();
+        lightbox = GLightbox({
+            selector: '.glightbox',
+            touchNavigation: true,
+            loop: false,
+            zoomable: true,
+            openEffect: 'zoom',
+            closeEffect: 'fade',
+            onOpen: () => {
+                closeNav();
+            }
+        });
+
+        document.querySelectorAll('.product-card img').forEach(img => {
+            img.ondblclick = (e) => {
+                e.preventDefault();
+                closeNav();
+                img.parentElement.click();
+            };
+        });
+    }
+
+    document.addEventListener('click', function(event) {
+        let sideNav = document.getElementById('sideNav');
+        let hamburger = document.querySelector('.hamburger');
+
+        if (sideNav.style.width === "260px" &&
+!sideNav.contains(event.target) &&
+!hamburger.contains(event.target)) {
+            closeNav();
+        }
+    });
+
+    window.onclick = function(event) {
+        let modal = document.getElementById('cartModal');
+        if (event.target == modal) closeCart();
+    }
+
+    loadProducts();
+    updateCartUI();
+</script>
+</body>
+</html>

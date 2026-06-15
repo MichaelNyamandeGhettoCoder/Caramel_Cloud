@@ -1,62 +1,58 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <script>
-    // 1. Gate: Check login immediately. Use 'caramel_auth' to match your login.html
-    if (sessionStorage.getItem('caramel_auth') !== 'true') {
-      location.replace('/login.html'); // boots them out
+    if (sessionStorage.getItem('caramel_auth')!== 'true') {
+      location.replace('/login.html');
     }
-    
-    // 2. Auto-lock: Remove auth when they leave/refresh
     addEventListener('pagehide', () => sessionStorage.removeItem('caramel_auth'));
-    
-    // 3. Extra: Kill auth if page loads from back/forward cache
     addEventListener('pageshow', (e) => {
-      if (e.persisted && sessionStorage.getItem('caramel_auth') !== 'true') {
+      if (e.persisted && sessionStorage.getItem('caramel_auth')!== 'true') {
         location.replace('/login.html');
       }
     });
   </script>
-   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Caramel Cloud Admin</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #fdf2f8; color: #1f2937; padding: 20px; }
-  .container { max-width: 600px; margin: 0 auto; }
+   .container { max-width: 600px; margin: 0 auto; }
     h1 { color: #be185d; font-size: 28px; margin-bottom: 8px; display: flex; align-items: center; gap: 10px; }
-  .logout { margin-left: auto; background: #f3f4f6; border: none; padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 18px; }
-  .tabs { display: flex; gap: 8px; margin: 20px 0; border-bottom: 2px solid #fbcfe8; }
-  .tab { padding: 12px 20px; background: none; border: none; border-bottom: 3px solid transparent; cursor: pointer; font-weight: 600; color: #6b7280; font-size: 15px; }
-  .tab.active { color: #be185d; border-bottom-color: #ec4899; }
-  .tab-content { display: none; }
-  .tab-content.active { display: block; }
+   .logout { margin-left: auto; background: #f3f4f6; border: none; padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 18px; }
+   .tabs { display: flex; gap: 8px; margin: 20px 0; border-bottom: 2px solid #fbcfe8; }
+   .tab { padding: 12px 20px; background: none; border-bottom: 3px solid transparent; cursor: pointer; font-weight: 600; color: #6b7280; font-size: 15px; }
+   .tab.active { color: #be185d; border-bottom-color: #ec4899; }
+   .tab-content { display: none; }
+   .tab-content.active { display: block; }
     label { display: block; font-weight: 600; margin: 15px 0 5px; font-size: 14px; }
     input, select, textarea { width: 100%; padding: 12px; border: 2px solid #fbcfe8; border-radius: 8px; font-size: 15px; font-family: inherit; }
     input:focus, select:focus, textarea:focus { outline: none; border-color: #ec4899; }
     button { width: 100%; padding: 14px; background: linear-gradient(135deg, #ec4899, #db2777); color: white; border: none; border-radius: 8px; font-weight: 700; font-size: 16px; cursor: pointer; margin-top: 15px; }
     button:disabled { opacity: 0.5; cursor: not-allowed; }
-  .product-card { background: white; padding: 15px; border-radius: 12px; margin-bottom: 12px; border: 2px solid #fbcfe8; }
-  .product-card img { width: 60px; height: 60px; object-fit: cover; border-radius: 8px; }
-  .product-header { display: flex; gap: 12px; align-items: center; }
-  .product-info { flex: 1; }
-  .product-name { font-weight: 700; color: #1f2937; }
-  .product-price { color: #be185d; font-weight: 600; }
-  .product-actions { display: flex; gap: 8px; margin-top: 10px; }
-  .btn-small { flex: 1; padding: 8px; font-size: 14px; margin: 0; }
-  .btn-edit { background: #3b82f6; }
-  .btn-delete { background: #ef4444; }
+   .product-card { background: white; padding: 15px; border-radius: 12px; margin-bottom: 12px; border: 2px solid #fbcfe8; }
+   .product-card img { width: 60px; height: 60px; object-fit: cover; border-radius: 8px; }
+   .product-header { display: flex; gap: 12px; align-items: center; }
+   .product-info { flex: 1; }
+   .product-name { font-weight: 700; color: #1f2937; }
+   .product-price { color: #be185d; font-weight: 600; }
+   .product-actions { display: flex; gap: 8px; margin-top: 10px; }
+   .btn-small { flex: 1; padding: 8px; font-size: 14px; margin: 0; }
+   .btn-edit { background: #3b82f6; }
+   .btn-delete { background: #ef4444; }
     #upload-status, #pass-msg { margin-top: 10px; font-size: 14px; font-weight: 600; }
-  .card { background: white; padding: 20px; border-radius: 12px; border: 2px solid #fbcfe8; margin-bottom: 20px; }
+   .card { background: white; padding: 20px; border-radius: 12px; border: 2px solid #fbcfe8; margin-bottom: 20px; }
   </style>
 </head>
 <body>
   <div class="container">
     <h1>Caramel Cloud Admin <button class="logout" onclick="logout()" title="Logout">↪</button></h1>
     <div class="tabs">
-      <button class="tab active" onclick="switchTab('add')">Add Product</button>
-      <button class="tab" onclick="switchTab('list')">Catalogue</button>
-      <button class="tab" onclick="switchTab('settings')">Settings</button>
+      <button class="tab active" onclick="switchTab('add', event)">Add Product</button>
+      <button class="tab" onclick="switchTab('list', event)">Catalogue</button>
+      <button class="tab" onclick="switchTab('settings', event)">Settings</button>
     </div>
 
     <div id="add" class="tab-content active">
@@ -65,8 +61,10 @@
       <label>Price ($)</label><input type="number" id="pprice" placeholder="0.00" step="0.01">
       <label>Category</label>
       <select id="pcategory">
-        <option value="">Select category</option><option>🎂 Cakes</option>
-  💄Cosmestics</option><option><option>🎁 Gift Boxes</option>
+        <option value="">Select category</option>
+        <option>🎂 Cakes</option>
+        <option>💄 Cosmetics</option>
+        <option>🎁 Gift Boxes</option>
       </select>
       <label>Product Photos</label><input type="file" id="pimages" multiple accept="image/*">
       <div style="font-size:13px;color:#6b7280;margin-top:5px">First image = main. Leave empty when editing to keep old images.</div>
@@ -87,22 +85,32 @@
   </div>
 
 <script>
-const PRODUCTS_KEY = 'caramel_products';
-let products = JSON.parse(localStorage.getItem(PRODUCTS_KEY) || '[]');
+let products = [];
 let currentFiles = [];
 
-if (sessionStorage.getItem('caramel_auth')!== 'true') window.location.href = '/login.html';
 function logout() { sessionStorage.removeItem('caramel_auth'); window.location.href = '/login.html'; }
 
-function switchTab(tab) {
+function switchTab(tab, e) {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-  event.target.classList.add('active');
+  if (e) e.target.classList.add('active');
   document.getElementById(tab).classList.add('active');
-  if (tab === 'list') renderProducts();
+  if (tab === 'list') loadProducts();
 }
 
 document.getElementById('pimages').onchange = (e) => { currentFiles = Array.from(e.target.files); };
+
+async function loadProducts() {
+  const list = document.getElementById('product-list');
+  list.innerHTML = '<div style="text-align:center;padding:40px;color:#6b7280">Loading...</div>';
+  try {
+    const res = await fetch('/api/products');
+    products = await res.json();
+    renderProducts();
+  } catch (err) {
+    list.innerHTML = '<div style="text-align:center;padding:40px;color:#ef4444">Failed to load products</div>';
+  }
+}
 
 async function saveProduct() {
   const editIndex = document.getElementById('editIndex').value;
@@ -129,8 +137,9 @@ async function saveProduct() {
       for (let i = 0; i < currentFiles.length; i++) {
         statusEl.innerText = `Uploading image ${i+1}/${currentFiles.length}...`;
         const base64 = await toBase64(currentFiles[i]);
-        const res = await fetch('/.netlify/functions/upload-image', {
+        const res = await fetch('/api/upload-image', {
           method: 'POST',
+          headers: {'Content-Type': 'application/json'},
           body: JSON.stringify({ image: base64 })
         });
         const data = await res.json();
@@ -139,11 +148,24 @@ async function saveProduct() {
       }
     }
 
-    const product = { name, price, category, images: imageUrls, created: isEditing? products[parseInt(editIndex)].created : Date.now() };
-    if (isEditing) products[parseInt(editIndex)] = product;
-    else products.unshift(product);
-    localStorage.setItem(PRODUCTS_KEY, JSON.stringify(products));
-    
+    const product = {
+      id: isEditing? products[parseInt(editIndex)].id : Date.now().toString(),
+      name,
+      price,
+      category,
+      images: imageUrls,
+      created: isEditing? products[parseInt(editIndex)].created : Date.now()
+    };
+
+    const method = isEditing? 'PUT' : 'POST';
+    const res = await fetch('/api/products', {
+      method,
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(product)
+    });
+
+    if (!res.ok) throw new Error('Save failed');
+
     document.getElementById('pname').value = '';
     document.getElementById('pprice').value = '';
     document.getElementById('pcategory').value = '';
@@ -153,7 +175,11 @@ async function saveProduct() {
     saveBtn.innerText = '✨ Save Product';
     statusEl.innerText = 'Saved!';
     statusEl.style.color = '#10b981';
-    setTimeout(() => { statusEl.innerText = ''; switchTab('list'); document.querySelectorAll('.tab')[1].click(); }, 800);
+    setTimeout(() => {
+      statusEl.innerText = '';
+      document.querySelectorAll('.tab')[1].click();
+      switchTab('list');
+    }, 800);
   } catch (err) {
     statusEl.innerText = 'Error: ' + err.message;
     statusEl.style.color = '#ef4444';
@@ -189,7 +215,7 @@ function renderProducts() {
       </div>
       <div class="product-actions">
         <button class="btn-small btn-edit" onclick="editProduct(${i})">Edit</button>
-        <button class="btn-small btn-delete" onclick="deleteProduct(${i})">Delete</button>
+        <button class="btn-small btn-delete" onclick="deleteProduct('${p.id}', ${i})">Delete</button>
       </div>
     </div>
   `).join('');
@@ -202,14 +228,25 @@ function editProduct(i) {
   document.getElementById('pprice').value = p.price;
   document.getElementById('pcategory').value = p.category;
   document.getElementById('save-btn').innerText = '💾 Update Product';
-  switchTab('add'); document.querySelectorAll('.tab')[0].click(); window.scrollTo(0, 0);
+  document.querySelectorAll('.tab')[0].click();
+  switchTab('add');
+  window.scrollTo(0, 0);
 }
 
-function deleteProduct(i) {
+async function deleteProduct(id, i) {
   if (confirm(`Delete ${products[i].name}?`)) {
-    products.splice(i, 1);
-    localStorage.setItem(PRODUCTS_KEY, JSON.stringify(products));
-    renderProducts();
+    try {
+      const res = await fetch('/api/products', {
+        method: 'DELETE',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ id })
+      });
+      if (!res.ok) throw new Error('Delete failed');
+      products.splice(i, 1);
+      renderProducts();
+    } catch (err) {
+      alert('Error: ' + err.message);
+    }
   }
 }
 
@@ -219,15 +256,23 @@ async function changePassword() {
   if (newPass.length < 4) { msg.innerText = 'Password must be at least 4 characters'; msg.style.color = '#ef4444'; return; }
   msg.innerText = 'Updating...'; msg.style.color = '#3b82f6';
   try {
-    const res = await fetch('/.netlify/functions/change-password', {
-      method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ newPassword: newPass })
+    const res = await fetch('/api/change-password', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ newPassword: newPass })
     });
-    if (res.ok) { msg.innerText = 'Password changed!'; msg.style.color = '#10b981'; document.getElementById('newPass').value = ''; }
-    else throw new Error('Failed');
-  } catch (err) { msg.innerText = 'Error: ' + err.message; msg.style.color = '#ef4444'; }
+    if (res.ok) {
+      msg.innerText = 'Password changed!';
+      msg.style.color = '#10b981';
+      document.getElementById('newPass').value = '';
+    } else throw new Error('Failed');
+  } catch (err) {
+    msg.innerText = 'Error: ' + err.message;
+    msg.style.color = '#ef4444';
+  }
 }
 
-renderProducts();
+loadProducts();
 </script>
 </body>
 </html>

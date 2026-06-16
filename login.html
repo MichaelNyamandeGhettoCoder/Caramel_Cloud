@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Login - Caramel Cloud</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { 
+      font-family: 'Poppins', sans-serif; 
+      background: #fdf2f8; 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      min-height: 100vh; 
+      padding: 20px;
+    }
+    .login-box { 
+      background: white; 
+      padding: 40px 30px; 
+      border-radius: 16px; 
+      box-shadow: 0 10px 30px rgba(214, 51, 132, 0.15);
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+    }
+    h1 { color: #d63384; margin-bottom: 30px; font-size: 24px; }
+    input { 
+      width: 100%; 
+      padding: 14px; 
+      margin: 10px 0; 
+      border: 2px solid #f9a8d4; 
+      border-radius: 8px; 
+      font-size: 16px;
+      font-family: inherit;
+    }
+    input:focus { outline: none; border-color: #d63384; }
+    button { 
+      width: 100%; 
+      padding: 14px; 
+      background: #d63384; 
+      color: white; 
+      border: none; 
+      border-radius: 8px; 
+      font-size: 16px; 
+      font-weight: 600; 
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    button:active { transform: scale(0.98); }
+    #error { color: #ef4444; margin-top: 15px; font-size: 14px; min-height: 20px; }
+  </style>
+</head>
+<body>
+  <div class="login-box">
+    <h1>Caramel Cloud Admin</h1>
+    <input type="password" id="pass" placeholder="Enter admin password">
+    <button onclick="login()">Login</button>
+    <div id="error"></div>
+  </div>
+
+<script>
+const ADMIN_PASSWORD = "caramel2026"; // Change this to your password
+
+function login() {
+  const pass = document.getElementById('pass').value;
+  const error = document.getElementById('error');
+  
+  if (pass === ADMIN_PASSWORD) {
+    sessionStorage.setItem('caramel_auth', 'true');
+    window.location.href = '/admin.html';
+  } else {
+    error.innerText = 'Wrong password';
+    document.getElementById('pass').value = '';
+  }
+}
+
+document.getElementById('pass').addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') login();
+});
+</script>
+</body>
+</html>

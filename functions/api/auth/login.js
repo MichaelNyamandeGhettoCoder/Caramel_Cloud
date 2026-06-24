@@ -56,7 +56,6 @@ if (inputHash !== user.password_hash) {
       }), {
         headers: { 'Content-Type': 'application/json' }
       });
-    }
 
     // Normal login success - set cookie
     const token = crypto.randomUUID();

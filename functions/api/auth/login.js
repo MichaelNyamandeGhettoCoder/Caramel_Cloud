@@ -68,11 +68,15 @@ if (inputHash !== user.password_hash) {
         'Set-Cookie': `auth=${token}; Path=/; Expires=${expiry.toUTCString()}; HttpOnly; Secure; SameSite=Strict`
       }
     });
-
-  } catch (err) {
-    return new Response(JSON.stringify({ error: 'Server error' }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
-  }
+} catch (err) {
+  console.log('Error:', err);
+  return new Response(JSON.stringify({ 
+    error: 'Server error',
+    debug: err.message, 
+    stack: err.stack
+  }), {
+    status: 500,
+    headers: { 'Content-Type': 'application/json' }
+  });
+}
 }

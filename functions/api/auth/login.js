@@ -1,24 +1,67 @@
-export async function onRequestPost(context) {
-  const { request, env } = context;
-  const { password } = await request.json();
+export async function onRequestPost({ request, env }) {
+  try {
+    const { password } = await request.json();
 
-  const hash = async (p) => {
-    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(p));
-    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
-  };
+    if (!password) {
+      return new Response(JSON.stringify({ error: 'Password required' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
 
-  const inputHash = await hash(password);
-  const user = await env.DB.prepare(
-    "SELECT id, email, is_default_password FROM users WHERE password_hash =?"
-  ).bind(inputHash).first();
+    // Hash the input password with SHA-1 to match DB
+    const msgBuffer = new TextEncoder().encode(password);
+    const hashBuffer = await crypto.subtle.digest('SHA-1', msgBuffer);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const inputHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 
-  if (!user) {
-    return Response.json({ success: false, error: 'Wrong password' }, { status: 401 });
+    // Get user from D1
+    const { results } = await env.DB.prepare(
+      'SELECT id, password_hash, is_default_password FROM users WHERE id = 1'
+    ).all();
+
+    if (!results.length) {
+      return new Response(JSON.stringify({ error: 'User not found' }), {
+        status: 404,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    const user = results[0];
+
+    // Compare hashes
+    if (inputHash!== user.password_hash) {
+      return new Response(JSON.stringify({ error: 'Wrong password' }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    // If default password, tell frontend to show setup modal
+    if (user.is_default_password === 1) {
+      return new Response(JSON.stringify({
+        success: false,
+        requireSetup: true
+      }), {
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    // Normal login success - set cookie
+    const token = crypto.randomUUID();
+    const expiry = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
+
+    return new Response(JSON.stringify({ success: true }), {
+      headers: {
+        'Content-Type': 'application/json',
+        'Set-Cookie': `auth=${token}; Path=/; Expires=${expiry.toUTCString()}; HttpOnly; Secure; SameSite=Strict`
+      }
+    });
+
+  } catch (err) {
+    return new Response(JSON.stringify({ error: 'Server error' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    });
   }
-
-  return Response.json({
-    success: true,
-    mustSetup: user.is_default_password === 1,
-    userId: user.id
-  });
 }

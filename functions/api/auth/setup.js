@@ -1,46 +1,55 @@
-export async function onRequestPost({ request, env }) {
+export async function onRequestPost(context) {
   try {
+    const { request, env } = context;
     const { password, email } = await request.json();
-    
+
     if (!password || !email) {
-      return new Response(JSON.stringify({ error: 'Email and password required' }), {
+      return new Response(JSON.stringify({ success: false, error: 'Password and email required' }), { 
         status: 400,
         headers: { 'Content-Type': 'application/json' }
       });
     }
 
-    // Hash the new password
+    // Check if DB binding exists
+    if (!env.DB) {
+      return new Response(JSON.stringify({ success: false, error: 'D1 binding missing' }), { 
+        status: 500,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    // Hash the password using Web Crypto API
     const encoder = new TextEncoder();
     const data = encoder.encode(password);
     const hashBuffer = await crypto.subtle.digest('SHA-256', data);
     const hashArray = Array.from(new Uint8Array(hashBuffer));
-    const newHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    const password_hash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 
-    // Update user: new hash, email, turn off default flag
-    await env.DB.prepare(`
-      UPDATE users 
-      SET password_hash = ?, 
-          recovery_email = ?, 
-          is_default_password = 0 
-      WHERE id = 1
-    `).bind(newHash, email).run();
+    // Actually update the DB and check if it worked
+    const result = await env.DB.prepare(
+      `UPDATE users SET password_hash = ?, recovery_email = ?, is_default_password = 0 WHERE id = 1`
+    ).bind(password_hash, email).run();
 
-    // Set auth cookie and log them in
-    const token = crypto.randomUUID();
-    const expiry = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-    
-    return new Response(JSON.stringify({ success: true }), {
-      headers: {
-        'Content-Type': 'application/json',
-        'Set-Cookie': `auth=${token}; Path=/; Expires=${expiry.toUTCString()}; HttpOnly; Secure; SameSite=Strict`
-      }
-    });
+    if (result.success && result.meta.changes > 0) {
+      return new Response(JSON.stringify({ success: true }), {
+        headers: { 'Content-Type': 'application/json' }
+      });
+    } else {
+      return new Response(JSON.stringify({ 
+        success: false, 
+        error: 'Database update failed',
+        details: result 
+      }), { 
+        status: 500,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
 
-  } catch (err) {
-    return new Response(JSON.stringify({
-      error: 'Setup failed',
-      debug: err.message
-    }), {
+  } catch (error) {
+    return new Response(JSON.stringify({ 
+      success: false, 
+      error: error.message 
+    }), { 
       status: 500,
       headers: { 'Content-Type': 'application/json' }
     });

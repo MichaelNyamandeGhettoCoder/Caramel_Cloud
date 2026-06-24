@@ -1,83 +1,257 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Login - Caramel Cloud</title>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { 
-      font-family: 'Poppins', sans-serif; 
-      background: #fdf2f8; 
-      display: flex; 
-      align-items: center; 
-      justify-content: center; 
-      min-height: 100vh; 
-      padding: 20px;
-    }
-    .login-box { 
-      background: white; 
-      padding: 40px 30px; 
-      border-radius: 16px; 
-      box-shadow: 0 10px 30px rgba(214, 51, 132, 0.15);
-      width: 100%;
-      max-width: 400px;
-      text-align: center;
-    }
-    h1 { color: #d63384; margin-bottom: 30px; font-size: 24px; }
-    input { 
-      width: 100%; 
-      padding: 14px; 
-      margin: 10px 0; 
-      border: 2px solid #f9a8d4; 
-      border-radius: 8px; 
-      font-size: 16px;
-      font-family: inherit;
-    }
-    input:focus { outline: none; border-color: #d63384; }
-    button { 
-      width: 100%; 
-      padding: 14px; 
-      background: #d63384; 
-      color: white; 
-      border: none; 
-      border-radius: 8px; 
-      font-size: 16px; 
-      font-weight: 600; 
-      cursor: pointer;
-      margin-top: 10px;
-    }
-    button:active { transform: scale(0.98); }
-    #error { color: #ef4444; margin-top: 15px; font-size: 14px; min-height: 20px; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Caramel Cloud - Admin Login</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .card {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 400px;
+        }
+        h1 { color: #333; margin-bottom: 8px; font-size: 28px; text-align: center; }
+        .subtitle { color: #666; text-align: center; margin-bottom: 32px; font-size: 14px; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; color: #333; font-weight: 500; font-size: 14px; }
+        input {
+            width: 100%; padding: 12px; border: 2px solid #e0e0e0;
+            border-radius: 8px; font-size: 16px; transition: border-color 0.2s;
+        }
+        input:focus { outline: none; border-color: #667eea; }
+        button {
+            width: 100%; padding: 14px; background: #667eea; color: white;
+            border: none; border-radius: 8px; font-size: 16px; font-weight: 600;
+            cursor: pointer; transition: background 0.2s;
+        }
+        button:hover { background: #5568d3; }
+        button:disabled { background: #ccc; cursor: not-allowed; }
+        .alert { padding: 12px; border-radius: 8px; margin-bottom: 20px; font-size: 14px; display: none; }
+        .alert.show { display: block; }
+        .error { background: #fee; color: #c33; }
+        .success { background: #efe; color: #3c3; }
+        .link { text-align: center; margin-top: 20px; font-size: 14px; }
+        .link a { color: #667eea; text-decoration: none; cursor: pointer; }
+        .link a:hover { text-decoration: underline; }
+        .modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 1000;
+        }
+        .modal.show { display: flex; }
+        .modal-content {
+            background: white; padding: 32px; border-radius: 12px;
+            width: 90%; max-width: 400px;
+        }
+        .modal h2 { margin-bottom: 16px; color: #333; }
+        .modal p { color: #666; margin-bottom: 20px; font-size: 14px; }
+        .modal-buttons { display: flex; gap: 12px; }
+        .modal-buttons button { flex: 1; }
+        .btn-secondary { background: #e0e0e0; color: #333; }
+        .btn-secondary:hover { background: #d0d0d0; }
+    </style>
 </head>
 <body>
-  <div class="login-box">
-    <h1>Caramel Cloud Admin</h1>
-    <input type="password" id="pass" placeholder="Enter admin password">
-    <button onclick="login()">Login</button>
-    <div id="error"></div>
-  </div>
+    <div class="card" id="login-card">
+        <h1>Caramel Cloud</h1>
+        <p class="subtitle">Admin Access</p>
+        
+        <div class="alert error" id="error-msg"></div>
+        <div class="alert success" id="success-msg"></div>
+        
+        <form id="login-form">
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" required autocomplete="current-password">
+            </div>
+            <button type="submit" id="login-btn">Sign In</button>
+        </form>
+        
+        <div class="link">
+            <a id="forgot-link">Forgot password?</a>
+        </div>
+    </div>
 
-<script>
-const ADMIN_PASSWORD = "caramel2026"; // Change this to your password
+    <!-- First Time Setup Modal -->
+    <div class="modal" id="setup-modal">
+        <div class="modal-content">
+            <h2>First Time Setup</h2>
+            <p>You're using the default password. Create a new secure password and add a recovery email to continue.</p>
+            <div class="alert error" id="setup-error"></div>
+            <form id="setup-form">
+                <div class="form-group">
+                    <label for="new-password">New Password</label>
+                    <input type="password" id="new-password" required minlength="8" autocomplete="new-password">
+                </div>
+                <div class="form-group">
+                    <label for="confirm-password">Confirm Password</label>
+                    <input type="password" id="confirm-password" required minlength="8" autocomplete="new-password">
+                </div>
+                <div class="form-group">
+                    <label for="recovery-email">Recovery Email</label>
+                    <input type="email" id="recovery-email" required autocomplete="email">
+                </div>
+                <button type="submit" id="setup-btn">Save & Continue</button>
+            </form>
+        </div>
+    </div>
 
-function login() {
-  const pass = document.getElementById('pass').value;
-  const error = document.getElementById('error');
-  
-  if (pass === ADMIN_PASSWORD) {
-    sessionStorage.setItem('caramel_auth', 'true');
-    window.location.href = '/admin.html';
-  } else {
-    error.innerText = 'Wrong password';
-    document.getElementById('pass').value = '';
-  }
-}
+    <!-- Recovery Modal -->
+    <div class="modal" id="recover-modal">
+        <div class="modal-content">
+            <h2>Reset Password</h2>
+            <p>Enter your recovery email. We'll send a recovery code if it matches our records.</p>
+            <div class="alert error" id="recover-error"></div>
+            <div class="alert success" id="recover-success"></div>
+            <form id="recover-form">
+                <div class="form-group">
+                    <label for="recover-email">Recovery Email</label>
+                    <input type="email" id="recover-email" required autocomplete="email">
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="btn-secondary" id="recover-cancel">Cancel</button>
+                    <button type="submit" id="recover-submit">Send Code</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
-document.getElementById('pass').addEventListener('keypress', (e) => {
-  if (e.key === 'Enter') login();
-});
-</script>
+    <script>
+        const API = '/api/auth';
+        const loginForm = document.getElementById('login-form');
+        const setupForm = document.getElementById('setup-form');
+        const recoverForm = document.getElementById('recover-form');
+        const errorMsg = document.getElementById('error-msg');
+        const successMsg = document.getElementById('success-msg');
+        const setupModal = document.getElementById('setup-modal');
+        const recoverModal = document.getElementById('recover-modal');
+
+        function showAlert(el, msg, type = 'error') {
+            el.textContent = msg;
+            el.className = `alert ${type} show`;
+            setTimeout(() => el.classList.remove('show'), 5000);
+        }
+
+        // Already logged in? Redirect to dashboard
+        if (document.cookie.includes('auth=')) {
+            window.location.href = '/admin.html'; // Change to your admin page
+        }
+
+        // Login submit
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('login-btn');
+            btn.disabled = true;
+            btn.textContent = 'Signing in...';
+            
+            try {
+                const res = await fetch(`${API}/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password: document.getElementById('password').value })
+                });
+                const data = await res.json();
+                
+                if (data.requireSetup) {
+                    setupModal.classList.add('show'); // Show password change modal
+                } else if (data.success) {
+                    showAlert(successMsg, 'Login successful! Redirecting...', 'success');
+                    setTimeout(() => window.location.href = '/admin.html', 800);
+                } else {
+                    showAlert(errorMsg, data.error || 'Invalid password');
+                }
+            } catch (err) {
+                showAlert(errorMsg, 'Network error. Check connection.');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Sign In';
+            }
+        });
+
+        // Setup submit - this is where you change password
+        setupForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const pass = document.getElementById('new-password').value;
+            const confirm = document.getElementById('confirm-password').value;
+            const email = document.getElementById('recovery-email').value;
+            const setupError = document.getElementById('setup-error');
+            const btn = document.getElementById('setup-btn');
+            
+            if (pass !== confirm) return showAlert(setupError, 'Passwords do not match');
+            if (pass.length < 8) return showAlert(setupError, 'Password must be 8+ characters');
+            
+            btn.disabled = true;
+            btn.textContent = 'Saving...';
+            
+            try {
+                const res = await fetch(`${API}/setup`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password: pass, email })
+                });
+                const data = await res.json();
+                
+                if (data.success) {
+                    setupModal.classList.remove('show');
+                    showAlert(successMsg, 'Setup complete! Redirecting...', 'success');
+                    setTimeout(() => window.location.href = '/admin.html', 800);
+                } else {
+                    showAlert(setupError, data.error || 'Setup failed');
+                }
+            } catch (err) {
+                showAlert(setupError, 'Network error. Try again.');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Save & Continue';
+            }
+        });
+
+        // Forgot password flow
+        document.getElementById('forgot-link').onclick = () => recoverModal.classList.add('show');
+        document.getElementById('recover-cancel').onclick = () => recoverModal.classList.remove('show');
+
+        recoverForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('recover-email').value;
+            const btn = document.getElementById('recover-submit');
+            const rErr = document.getElementById('recover-error');
+            const rSuc = document.getElementById('recover-success');
+            
+            btn.disabled = true;
+            btn.textContent = 'Sending...';
+            
+            try {
+                const res = await fetch(`${API}/recover`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    showAlert(rSuc, 'If that email exists, a recovery code was sent.', 'success');
+                    setTimeout(() => recoverModal.classList.remove('show'), 3000);
+                } else {
+                    showAlert(rErr, data.error || 'Failed');
+                }
+            } catch (err) {
+                showAlert(rErr, 'Network error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Send Code';
+            }
+        });
+    </script>
 </body>
 </html>

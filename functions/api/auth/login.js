@@ -32,11 +32,20 @@ console.log('DB hash:', user.password_hash);
 console.log('Input:', password, 'Hash:', inputHash);
 console.log('DB hash:', user.password_hash);
     // Compare hashes
-    if (inputHash!== user.password_hash) {
-      return new Response(JSON.stringify({ error: 'Wrong password' }), {
-        status: 401,
-        headers: { 'Content-Type': 'application/json' }
-      });
+if (inputHash !== user.password_hash) {
+  return new Response(JSON.stringify({ 
+    error: 'Wrong password',
+    debug: {
+      inputPassword: password,
+      generatedHash: inputHash,
+      expectedHash: user.password_hash,
+      match: inputHash === user.password_hash
+    }
+  }), { 
+    status: 401,
+    headers: { 'Content-Type': 'application/json' }
+  });
+}
     }
 
     // If default password, tell frontend to show setup modal

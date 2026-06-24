@@ -14,7 +14,8 @@ export async function onRequestPost({ request, env }) {
     const hashBuffer = await crypto.subtle.digest('SHA-1', msgBuffer);
     const hashArray = Array.from(new Uint8Array(hashBuffer));
     const inputHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-
+console.log('Input:', password, 'Hash:', inputHash);
+console.log('DB hash:', user.password_hash);
     // Get user from D1
     const { results } = await env.DB.prepare(
       'SELECT id, password_hash, is_default_password FROM users WHERE id = 1'
@@ -28,7 +29,8 @@ export async function onRequestPost({ request, env }) {
     }
 
     const user = results[0];
-
+console.log('Input:', password, 'Hash:', inputHash);
+console.log('DB hash:', user.password_hash);
     // Compare hashes
     if (inputHash!== user.password_hash) {
       return new Response(JSON.stringify({ error: 'Wrong password' }), {

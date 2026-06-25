@@ -1,7 +1,7 @@
 export async function onRequestPost({ request, env }) {
   try {
     const { password } = await request.json();
-    
+
     if (!password) {
       return new Response(JSON.stringify({ error: 'Password required' }), {
         status: 400,
@@ -18,7 +18,7 @@ export async function onRequestPost({ request, env }) {
 
     // Get user from D1
     const { results } = await env.DB.prepare('SELECT * FROM users WHERE id = 1').all();
-    
+
     if (!results.length) {
       return new Response(JSON.stringify({ error: 'User not found' }), {
         status: 404,
@@ -27,17 +27,15 @@ export async function onRequestPost({ request, env }) {
     }
 
     const user = results[0];
-    console.log('Input:', password, 'Hash:', inputHash);
-    console.log('DB hash:', user.password_hash);
 
-    // Compare hashes
-// Check password
-if (inputHash !== user.password_hash) {
-  return new Response(JSON.stringify({ success: false, error: 'Invalid password' }), {
-    status: 401,
-    headers: { 'Content-Type': 'application/json' }
-  });
-}
+    // Check password
+    if (inputHash!== user.password_hash) {
+      return new Response(JSON.stringify({ success: false, error: 'Invalid password' }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
     // If default password, tell frontend to show setup
     if (user.is_default_password === 1) {
       return new Response(JSON.stringify({
@@ -51,7 +49,7 @@ if (inputHash !== user.password_hash) {
     // Normal login success - set cookie
     const token = crypto.randomUUID();
     const expiry = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-    
+
     return new Response(JSON.stringify({ success: true }), {
       headers: {
         'Content-Type': 'application/json',
@@ -60,11 +58,8 @@ if (inputHash !== user.password_hash) {
     });
 
   } catch (err) {
-    console.log('Error:', err);
     return new Response(JSON.stringify({
-      error: 'Server error',
-      debug: err.message,
-      stack: err.stack
+      error: 'Server error'
     }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' }

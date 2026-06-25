@@ -31,21 +31,13 @@ export async function onRequestPost({ request, env }) {
     console.log('DB hash:', user.password_hash);
 
     // Compare hashes
-    if (inputHash!== user.password_hash) {
-      return new Response(JSON.stringify({
-        error: 'Wrong password',
-        debug: {
-          inputPassword: password,
-          generatedHash: inputHash,
-          expectedHash: user.password_hash,
-          match: inputHash === user.password_hash
-        }
-      }), {
-        status: 401,
-        headers: { 'Content-Type': 'application/json' }
-      });
-    }
-
+// Check password
+if (inputHash !== user.password_hash) {
+  return new Response(JSON.stringify({ success: false, error: 'Invalid password' }), {
+    status: 401,
+    headers: { 'Content-Type': 'application/json' }
+  });
+}
     // If default password, tell frontend to show setup
     if (user.is_default_password === 1) {
       return new Response(JSON.stringify({
